@@ -25,8 +25,8 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 		l.purgeOldestItem()
 	}
 
-	cashItem := &cacheItem{key: string(key), value: value}
-	listItem := l.queue.PushFront(cashItem)
+	cacheItem := &cacheItem{key: string(key), value: value}
+	listItem := l.queue.PushFront(cacheItem)
 	l.items[key] = listItem
 
 	return false

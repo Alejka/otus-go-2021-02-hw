@@ -83,10 +83,6 @@ func (l *list) Remove(i *ListItem) {
 		i.Next.Prev = i.Prev
 	}
 
-	// clean pointers
-	i.Next = nil
-	i.Prev = nil
-
 	l.len--
 }
 
