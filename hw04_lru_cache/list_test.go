@@ -47,5 +47,26 @@ func TestList(t *testing.T) {
 			elems = append(elems, i.Value.(int))
 		}
 		require.Equal(t, []int{70, 80, 60, 40, 10, 30, 50}, elems)
+
+		item := l.Back().Prev.Prev.Prev // 40
+		l.MoveToFront(item)             // [40, 70, 80, 60, 10, 30, 50]
+		require.Equal(t, 7, l.Len())
+		require.Equal(t, 40, l.Front().Value)
+
+		l.Remove(l.Front()) // [70, 80, 60, 10, 30, 50]
+		l.Remove(l.Back())  // [70, 80, 60, 10, 30]
+		require.Equal(t, 5, l.Len())
+
+		elems = make([]int, 0, l.Len())
+		for i := l.Front(); i != nil; i = i.Next {
+			elems = append(elems, i.Value.(int))
+		}
+		require.Equal(t, []int{70, 80, 60, 10, 30}, elems)
+
+		// test removing last element
+		l = NewList()
+		l.PushBack(10)
+		l.Remove(l.Front())
+		require.Equal(t, 0, l.Len())
 	})
 }
