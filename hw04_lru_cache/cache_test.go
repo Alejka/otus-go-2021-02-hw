@@ -50,7 +50,54 @@ func TestCache(t *testing.T) {
 	})
 
 	t.Run("purge logic", func(t *testing.T) {
-		// Write me
+		c := NewCache(3)
+
+		c.Set("aaa", 100)
+		c.Clear()
+
+		val, ok := c.Get("aaa")
+		require.False(t, ok)
+		require.Nil(t, val)
+	})
+
+	t.Run("remove due to queue capacity", func(t *testing.T) {
+		c := NewCache(3)
+		c.Set("aaa", 100)
+		c.Set("bbb", 200)
+		c.Set("ccc", 300) // [{"ccc", 300}, {"bbb", 200}, {"aaa", 100}]
+
+		c.Set("ddd", 400) // [{"ddd", 400}, {"ccc", 300}, {"bbb", 200}]
+		val, ok := c.Get("aaa")
+		require.False(t, ok)
+		require.Nil(t, val)
+	})
+
+	t.Run("remove long-used", func(t *testing.T) {
+		c := NewCache(3)
+
+		c.Set("aaa", 100)
+		c.Set("bbb", 200)
+		c.Set("ccc", 300) // [{"ccc", 300}, {"bbb", 200}, {"aaa", 100}]
+
+		c.Set("aaa", 500) // [{"aaa", 500}, {"ccc", 300}, {"bbb", 200}]
+		c.Get("bbb")      // [{"bbb", 200}, {"aaa", 500}, {"ccc", 300}]
+		c.Set("ddd", 400) // [{"ddd", 400}, {"bbb", 200}, {"aaa", 500}]
+
+		val, ok := c.Get("ccc")
+		require.False(t, ok)
+		require.Nil(t, val)
+
+		val, ok = c.Get("aaa")
+		require.True(t, ok)
+		require.Equal(t, 500, val)
+
+		val, ok = c.Get("bbb")
+		require.True(t, ok)
+		require.Equal(t, 200, val)
+
+		val, ok = c.Get("ddd")
+		require.True(t, ok)
+		require.Equal(t, 400, val)
 	})
 }
 
